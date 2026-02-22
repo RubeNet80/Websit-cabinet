@@ -1,0 +1,60 @@
+2026-02-22T07:24:50.874361Z  INFO tailwindcss_oxide::scanner: Provided sources:
+2026-02-22T07:24:50.874479Z  INFO tailwindcss_oxide::scanner: Source: PublicSourceEntry { base: "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet", pattern: "**/*", negated: false }
+2026-02-22T07:24:50.874675Z  INFO tailwindcss_oxide::scanner: Optimized sources:
+2026-02-22T07:24:50.874695Z  INFO tailwindcss_oxide::scanner: Source: Auto { base: "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet" }
+2026-02-22T07:24:50.876232Z  INFO discover_sources: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.876534Z  INFO discover_sources:walk_synchronous: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.881719Z  INFO discover_sources:walk_synchronous: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.882087Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\eslint.config.mjs"
+2026-02-22T07:24:50.882097Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\api\\waiting-list\\[id]\\route.ts"
+2026-02-22T07:24:50.882178Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\dashboard\\page.tsx"
+2026-02-22T07:24:50.882187Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\public\\globe.svg"
+2026-02-22T07:24:50.882253Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\layout.tsx"
+2026-02-22T07:24:50.882302Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\public\\next.svg"
+2026-02-22T07:24:50.882297Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\README.md"
+2026-02-22T07:24:50.882323Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\page.tsx"
+2026-02-22T07:24:50.882306Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\netlify-build-log.txt"
+2026-02-22T07:24:50.882336Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\next.config.ts"
+2026-02-22T07:24:50.882397Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\public\\vercel.svg"
+2026-02-22T07:24:50.882407Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\BlogPreview.tsx"
+2026-02-22T07:24:50.882417Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\api\\admin\\blog\\route.ts"
+2026-02-22T07:24:50.882437Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\package.json"
+2026-02-22T07:24:50.882463Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\netlify.toml"
+2026-02-22T07:24:50.882492Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\ContactForm.tsx"
+2026-02-22T07:24:50.882493Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\public\\window.svg"
+2026-02-22T07:24:50.882498Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\Header.tsx"
+2026-02-22T07:24:50.882513Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\postcss.config.mjs"
+2026-02-22T07:24:50.882573Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\Footer.tsx"
+2026-02-22T07:24:50.882493Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\api\\admin\\waiting-list\\route.ts"
+2026-02-22T07:24:50.882592Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\data\\db.json"
+2026-02-22T07:24:50.882566Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\public\\file.svg"
+2026-02-22T07:24:50.882612Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\Hero.tsx"
+2026-02-22T07:24:50.882652Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\api\\waiting-list\\route.ts"
+2026-02-22T07:24:50.882664Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\Practitioners.tsx"
+2026-02-22T07:24:50.882689Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\lib\\db.ts"
+2026-02-22T07:24:50.882715Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\tsconfig.json"
+2026-02-22T07:24:50.882731Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\components\\WaitingCounter.tsx"
+2026-02-22T07:24:50.882757Z  INFO tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\verify_api.js"
+2026-02-22T07:24:50.882892Z  INFO discover_sources: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.882912Z  INFO extract_candidates: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.882917Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.882924Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.883582Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.883602Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.883608Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.883612Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading 1 file(s)
+2026-02-22T07:24:50.883693Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading "C:\\Users\\Rubenet\\OneDrive\\Escritorio\\Proyectos Desarrollo\\Website Cabinet\\src\\app\\globals.css"
+2026-02-22T07:24:50.883703Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.883710Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.883715Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.883757Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.883773Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.883919Z  INFO extract_candidates: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.884244Z  INFO get_files: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.884251Z  INFO get_files:discover_sources: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.884255Z  INFO get_files:discover_sources: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.884314Z  INFO get_files: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.884713Z  INFO get_globs: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.884755Z  INFO get_globs:discover_sources: tailwindcss_oxide::scanner: enter
+2026-02-22T07:24:50.884762Z  INFO get_globs:discover_sources: tailwindcss_oxide::scanner: exit
+2026-02-22T07:24:50.891062Z  INFO get_globs: tailwindcss_oxide::scanner: exit

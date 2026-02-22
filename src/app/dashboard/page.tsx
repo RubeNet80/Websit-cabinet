@@ -1,0 +1,375 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { WaitingListEntry, BlogPost } from '@/lib/db';
+
+type Tab = 'dashboard' | 'blog';
+
+export default function Dashboard() {
+    const [tab, setTab] = useState<Tab>('dashboard');
+    const [patients, setPatients] = useState<WaitingListEntry[]>([]);
+    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Blog form state
+    const [showBlogForm, setShowBlogForm] = useState(false);
+    const [blogForm, setBlogForm] = useState({ title: '', slug: '', excerpt: '', content: '', cover_url: '', status: 'draft' as 'draft' | 'published' });
+    const [blogSaving, setBlogSaving] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    const fetchPatients = async () => {
+        try {
+            const res = await fetch('/api/admin/waiting-list');
+            if (res.ok) {
+                const data = await res.json();
+                // Normalize Supabase snake_case → camelCase
+                setPatients(data.map((p: any) => ({
+                    id: p.id,
+                    firstName: p.first_name,
+                    lastName: p.last_name,
+                    phone: p.phone,
+                    motif: p.motif,
+                    createdAt: p.created_at,
+                })));
+            }
+        } catch (e) { console.error(e); }
+        finally { setLoading(false); }
+    };
+
+    const fetchPosts = async () => {
+        try {
+            const res = await fetch('/api/admin/blog');
+            if (res.ok) setPosts(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
+    useEffect(() => {
+        fetchPatients();
+        fetchPosts();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Marquer ce patient comme traité et le retirer de la liste ?')) return;
+        const res = await fetch(`/api/waiting-list/${id}`, { method: 'DELETE' });
+        if (res.ok) setPatients(p => p.filter(x => x.id !== id));
+    };
+
+    const handleBlogSave = async () => {
+        if (!blogForm.title || !blogForm.slug) return alert('Titre et slug obligatoires');
+        setBlogSaving(true);
+        try {
+            const url = editingId ? `/api/admin/blog/${editingId}` : '/api/admin/blog';
+            const method = editingId ? 'PUT' : 'POST';
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(blogForm),
+            });
+            if (res.ok) {
+                await fetchPosts();
+                setShowBlogForm(false);
+                setEditingId(null);
+                setBlogForm({ title: '', slug: '', excerpt: '', content: '', cover_url: '', status: 'draft' });
+            }
+        } catch (e) { console.error(e); }
+        finally { setBlogSaving(false); }
+    };
+
+    const handleBlogEdit = (post: BlogPost) => {
+        setEditingId(post.id);
+        setBlogForm({ title: post.title, slug: post.slug, excerpt: post.excerpt ?? '', content: post.content ?? '', cover_url: post.cover_url ?? '', status: post.status });
+        setShowBlogForm(true);
+        setTab('blog');
+    };
+
+    const handleBlogDelete = async (id: string) => {
+        if (!confirm('Supprimer cet article ?')) return;
+        const res = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
+        if (res.ok) setPosts(p => p.filter(x => x.id !== id));
+    };
+
+    const generateSlug = (title: string) =>
+        title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    return (
+        <div className="bg-slate-50 text-slate-900 min-h-screen pb-24">
+            {/* Header */}
+            <header className="sticky top-0 z-50 border-b border-slate-200 px-4 py-3" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                <div className="flex items-center justify-between max-w-lg mx-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center" style={{ background: 'rgba(19,127,236,0.1)' }}>
+                            <span className="material-symbols-outlined text-xl" style={{ color: '#137fec' }}>manage_accounts</span>
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-bold leading-tight">Tableau de bord</h1>
+                            <p className="text-slate-500 font-medium uppercase tracking-wider" style={{ fontSize: 10 }}>Cabinet Saint-Sauveur</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Link className="p-2 rounded-lg text-slate-500 hover:bg-slate-100" href="/">
+                            <span className="material-symbols-outlined text-xl">public</span>
+                        </Link>
+                        <button
+                            onClick={() => signOut({ callbackUrl: '/login' })}
+                            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition"
+                        >
+                            <span className="material-symbols-outlined text-xl">logout</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+                {/* Tabs */}
+                <div className="flex p-1 rounded-xl" style={{ background: 'rgba(148,163,184,0.15)' }}>
+                    {(['dashboard', 'blog'] as Tab[]).map(t => (
+                        <button
+                            key={t}
+                            onClick={() => setTab(t)}
+                            className={`flex-1 py-2 text-sm font-bold rounded-lg capitalize transition ${tab === t ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}
+                            style={{ color: tab === t ? '#137fec' : undefined }}
+                        >
+                            {t === 'dashboard' ? 'Liste d\'attente' : 'Blog'}
+                        </button>
+                    ))}
+                </div>
+
+                {/* ---- TAB: WAITING LIST ---- */}
+                {tab === 'dashboard' && (
+                    <>
+                        {/* KPI */}
+                        <div className="relative overflow-hidden rounded-2xl p-6 shadow-lg" style={{ background: '#137fec', boxShadow: '0 8px 24px rgba(19,127,236,0.3)' }}>
+                            <div className="relative z-10">
+                                <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.8)' }}>Total Patients en Attente</p>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="font-extrabold text-white tracking-tight" style={{ fontSize: 48 }}>
+                                        {loading ? '...' : patients.length}
+                                    </span>
+                                    <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>personnes</span>
+                                </div>
+                            </div>
+                            <div className="absolute rounded-full blur-2xl" style={{ right: -32, bottom: -32, width: 128, height: 128, background: 'rgba(255,255,255,0.1)' }} />
+                            <div className="absolute right-4 top-4">
+                                <span className="material-symbols-outlined" style={{ fontSize: 64, color: 'rgba(255,255,255,0.2)' }}>group</span>
+                            </div>
+                        </div>
+
+                        {/* List */}
+                        <section>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-bold flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-blue-600">list_alt</span>
+                                    Liste d'Attente
+                                </h2>
+                                <button onClick={fetchPatients} className="text-xs font-semibold px-3 py-1.5 bg-slate-100 rounded-lg text-slate-500 hover:bg-slate-200 transition">
+                                    Actualiser
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                {loading ? (
+                                    <p className="text-center text-slate-400 py-12">Chargement...</p>
+                                ) : patients.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <span className="material-symbols-outlined text-4xl text-slate-300">sentiment_satisfied</span>
+                                        <p className="text-slate-400 mt-2">Aucun patient en attente 🎉</p>
+                                    </div>
+                                ) : (
+                                    patients.map((p) => (
+                                        <div key={p.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start">
+                                                    <h3 className="font-bold text-sm">{p.lastName.toUpperCase()} {p.firstName}</h3>
+                                                    <span className="text-slate-400 font-medium" style={{ fontSize: 10 }}>
+                                                        {new Date(p.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} {new Date(p.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs font-medium mt-0.5" style={{ color: '#137fec' }}>{p.motif}</p>
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    <span className="material-symbols-outlined text-slate-400" style={{ fontSize: 13 }}>call</span>
+                                                    <a href={`tel:${p.phone}`} className="text-slate-500 hover:text-slate-700 transition" style={{ fontSize: 12 }}>{p.phone}</a>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDelete(p.id)}
+                                                className="flex items-center justify-center border rounded-full flex-shrink-0 transition-colors hover:bg-green-100"
+                                                style={{ width: 40, height: 40, background: '#f0fdf4', borderColor: '#dcfce7', color: '#16a34a' }}
+                                                title="Marquer comme traité"
+                                            >
+                                                <span className="material-symbols-outlined font-bold" style={{ fontSize: 20 }}>check</span>
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    </>
+                )}
+
+                {/* ---- TAB: BLOG ---- */}
+                {tab === 'blog' && (
+                    <section className="pb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold flex items-center gap-2">
+                                <span className="material-symbols-outlined text-blue-600">article</span>
+                                Gestion du Blog
+                            </h2>
+                            <button
+                                onClick={() => { setShowBlogForm(true); setEditingId(null); setBlogForm({ title: '', slug: '', excerpt: '', content: '', cover_url: '', status: 'draft' }); }}
+                                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg text-white transition"
+                                style={{ background: '#137fec' }}
+                            >
+                                <span className="material-symbols-outlined text-sm">add</span>
+                                Nouvel article
+                            </button>
+                        </div>
+
+                        {/* Blog Form */}
+                        {showBlogForm && (
+                            <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-4 shadow-sm space-y-3">
+                                <h3 className="font-bold text-sm text-slate-700">{editingId ? 'Modifier l\'article' : 'Nouvel article'}</h3>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">Titre</label>
+                                    <input
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm" placeholder="Titre de l'article"
+                                        value={blogForm.title}
+                                        onChange={e => setBlogForm(f => ({ ...f, title: e.target.value, slug: editingId ? f.slug : generateSlug(e.target.value) }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">Slug (URL)</label>
+                                    <input
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm font-mono text-slate-500" placeholder="mon-article"
+                                        value={blogForm.slug}
+                                        onChange={e => setBlogForm(f => ({ ...f, slug: e.target.value }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">Résumé</label>
+                                    <textarea
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm" rows={2} placeholder="Courte description..."
+                                        value={blogForm.excerpt}
+                                        onChange={e => setBlogForm(f => ({ ...f, excerpt: e.target.value }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">Contenu (HTML)</label>
+                                    <textarea
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm font-mono" rows={6} placeholder="<p>Contenu de l'article...</p>"
+                                        value={blogForm.content}
+                                        onChange={e => setBlogForm(f => ({ ...f, content: e.target.value }))}
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">URL Image de couverture</label>
+                                    <input
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm" placeholder="https://..."
+                                        value={blogForm.cover_url}
+                                        onChange={e => setBlogForm(f => ({ ...f, cover_url: e.target.value }))}
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <label className="text-xs font-bold text-slate-400 uppercase">Statut</label>
+                                    <select
+                                        className="border border-slate-200 rounded-lg py-2 px-3 text-sm"
+                                        value={blogForm.status}
+                                        onChange={e => setBlogForm(f => ({ ...f, status: e.target.value as 'draft' | 'published' }))}
+                                    >
+                                        <option value="draft">Brouillon</option>
+                                        <option value="published">Publié</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        onClick={handleBlogSave}
+                                        disabled={blogSaving}
+                                        className="flex-1 py-2.5 text-sm font-bold text-white rounded-xl disabled:opacity-60 transition"
+                                        style={{ background: '#137fec' }}
+                                    >
+                                        {blogSaving ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Publier')}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowBlogForm(false)}
+                                        className="px-4 py-2.5 text-sm font-bold text-slate-500 rounded-xl bg-slate-100 hover:bg-slate-200 transition"
+                                    >
+                                        Annuler
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Posts List */}
+                        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                            {posts.length === 0 ? (
+                                <div className="text-center py-12 text-slate-400">
+                                    <span className="material-symbols-outlined text-4xl text-slate-300">article</span>
+                                    <p className="mt-2 text-sm">Aucun article pour le moment</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-slate-100">
+                                    {posts.map(post => (
+                                        <div key={post.id} className="p-4 flex items-center gap-4">
+                                            {post.cover_url && (
+                                                <div className="rounded-lg overflow-hidden shrink-0" style={{ width: 48, height: 48 }}>
+                                                    <img alt={post.title} className="w-full h-full object-cover" src={post.cover_url} />
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-bold truncate">{post.title}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span
+                                                        className="px-1.5 py-0.5 rounded font-bold uppercase"
+                                                        style={{ fontSize: 9, color: post.status === 'published' ? '#16a34a' : '#d97706', background: post.status === 'published' ? '#dcfce7' : '#fef3c7' }}
+                                                    >
+                                                        {post.status === 'published' ? 'Publié' : 'Brouillon'}
+                                                    </span>
+                                                    <span className="text-slate-400" style={{ fontSize: 10 }}>
+                                                        {new Date(post.created_at).toLocaleDateString('fr-FR')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <button onClick={() => handleBlogEdit(post)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                                    <span className="material-symbols-outlined text-lg">edit</span>
+                                                </button>
+                                                <button onClick={() => handleBlogDelete(post.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition">
+                                                    <span className="material-symbols-outlined text-lg">delete</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                )}
+            </main>
+
+            {/* Bottom Nav */}
+            <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 px-6 pb-6 pt-2" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                <div className="max-w-lg mx-auto flex items-center justify-around">
+                    <button onClick={() => setTab('dashboard')} className="flex flex-col items-center gap-1 transition" style={{ color: tab === 'dashboard' ? '#137fec' : '#94a3b8' }}>
+                        <span className="material-symbols-outlined" style={{ fontVariationSettings: tab === 'dashboard' ? "'FILL' 1" : "'FILL' 0" }}>dashboard</span>
+                        <span className="font-bold" style={{ fontSize: 10 }}>Tableau</span>
+                    </button>
+                    <button onClick={() => setTab('blog')} className="flex flex-col items-center gap-1 transition" style={{ color: tab === 'blog' ? '#137fec' : '#94a3b8' }}>
+                        <span className="material-symbols-outlined" style={{ fontVariationSettings: tab === 'blog' ? "'FILL' 1" : "'FILL' 0" }}>rss_feed</span>
+                        <span className="font-bold" style={{ fontSize: 10 }}>Blog</span>
+                    </button>
+                    <Link href="/" className="flex flex-col items-center gap-1" style={{ color: '#94a3b8' }}>
+                        <span className="material-symbols-outlined">public</span>
+                        <span className="font-bold" style={{ fontSize: 10 }}>Site</span>
+                    </Link>
+                </div>
+            </nav>
+        </div>
+    );
+}
