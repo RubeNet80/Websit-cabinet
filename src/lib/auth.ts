@@ -14,19 +14,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const adminEmail = process.env.ADMIN_EMAIL;
                 const adminHash = process.env.ADMIN_PASSWORD_HASH;
 
+                console.log('--- Login Attempt Debug ---');
+                console.log('Target Email:', adminEmail);
+                console.log('Provided Email:', credentials?.email);
+                console.log('Hash configured:', !!adminHash);
+
                 if (!adminEmail || !adminHash) {
                     console.error('Admin credentials not configured in environment variables');
                     return null;
                 }
 
-                if (credentials?.email !== adminEmail) return null;
+                if (credentials?.email !== adminEmail) {
+                    console.log('Email mismatch');
+                    return null;
+                }
 
                 const isValid = await bcrypt.compare(
                     credentials.password as string,
                     adminHash
                 );
 
-                if (!isValid) return null;
+                if (!isValid) {
+                    console.log('Password mismatch');
+                    return null;
+                }
+
+                console.log('Login successful');
 
                 return {
                     id: '1',
