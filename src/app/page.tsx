@@ -225,9 +225,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl overflow-hidden border border-slate-200" style={{ height: 192, filter: 'grayscale(1)' }}>
-              <img alt="Plan d'accès" className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB96y143ixCkV5KnGrhdBZ1j-Dlxf19X-XBP6tbBccetog2lwjXs6Iim8LCQjt0LtvPd3tb1PjeHnvU2aeTjX-6Lo-bRKwObGw8-jefL7nVifKRI6H4LqKO9Z9LMT6nuaRMR-wWLOYmjB-rmE0ZbFZj-rEcZ4hxyN5VID4SWjVDfU0fHjpqom_38QhmYiJUuOSbrya91FX29xfoc9PzwaQGrTj8ya1mv0w-awBk6uuwFL1faOD6y2muhS2vDyyIURvCJbTTYS1agjM" />
+            <div className="rounded-xl overflow-hidden border border-slate-200" style={{ height: 192 }}>
+              <iframe
+                title="Plan d'accès - Cabinet Kiné Saint-Sauveur-en-Rue"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=4.3889%2C45.3470%2C4.3989%2C45.3530&layer=mapnik&marker=45.3500%2C4.3939"
+                width="100%"
+                height="192"
+                style={{ border: 0, display: 'block' }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
