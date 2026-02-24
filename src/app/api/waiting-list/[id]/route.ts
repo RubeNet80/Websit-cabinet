@@ -29,3 +29,32 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
 }
+
+// PATCH — actualiza campos de un paciente (ej: claimed_by)
+export async function PATCH(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { claimedBy } = body;
+
+    const { data, error } = await supabaseAdmin
+        .from('waiting_list')
+        .update({ claimed_by: claimedBy })
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Supabase update error:', error);
+        return NextResponse.json({ error: `Error base de datos: ${error.message}` }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, data });
+}

@@ -19,6 +19,11 @@ export default function Dashboard() {
     const [blogSaving, setBlogSaving] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    // Patient form state
+    const [showPatientForm, setShowPatientForm] = useState(false);
+    const [patientForm, setPatientForm] = useState({ firstName: '', lastName: '', phone: '', motif: '' });
+    const [patientSaving, setPatientSaving] = useState(false);
+
     const fetchPatients = async () => {
         try {
             const res = await fetch('/api/admin/waiting-list');
@@ -32,6 +37,7 @@ export default function Dashboard() {
                     phone: p.phone,
                     motif: p.motif,
                     createdAt: p.created_at,
+                    claimedBy: p.claimed_by,
                 })));
             }
         } catch (e) { console.error(e); }
@@ -54,6 +60,46 @@ export default function Dashboard() {
         if (!confirm('Marquer ce patient comme traité et le retirer de la liste ?')) return;
         const res = await fetch(`/api/waiting-list/${id}`, { method: 'DELETE' });
         if (res.ok) setPatients(p => p.filter(x => x.id !== id));
+    };
+
+    const handleClaim = async (id: string, name: string | null) => {
+        try {
+            const res = await fetch(`/api/waiting-list/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ claimedBy: name }),
+            });
+            if (res.ok) {
+                setPatients(prev => prev.map(p => p.id === id ? { ...p, claimedBy: name } : p));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handlePatientSave = async () => {
+        if (!patientForm.firstName || !patientForm.lastName || !patientForm.phone || !patientForm.motif) {
+            return alert('Tous les champs sont obligatoires');
+        }
+        setPatientSaving(true);
+        try {
+            const res = await fetch('/api/waiting-list', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(patientForm),
+            });
+            if (res.ok) {
+                await fetchPatients();
+                setShowPatientForm(false);
+                setPatientForm({ firstName: '', lastName: '', phone: '', motif: '' });
+            } else {
+                alert('Erreur lors de l\'enregistrement');
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setPatientSaving(false);
+        }
     };
 
     const handleBlogSave = async () => {
@@ -163,10 +209,71 @@ export default function Dashboard() {
                                     <span className="material-symbols-outlined text-blue-600">list_alt</span>
                                     Liste d'Attente
                                 </h2>
-                                <button onClick={fetchPatients} className="text-xs font-semibold px-3 py-1.5 bg-slate-100 rounded-lg text-slate-500 hover:bg-slate-200 transition">
-                                    Actualiser
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowPatientForm(!showPatientForm)}
+                                        className="text-xs font-semibold px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">person_add</span>
+                                        {showPatientForm ? 'Annuler' : 'Ajouter'}
+                                    </button>
+                                    <button onClick={fetchPatients} className="text-xs font-semibold px-3 py-1.5 bg-slate-100 rounded-lg text-slate-500 hover:bg-slate-200 transition">
+                                        Actualiser
+                                    </button>
+                                </div>
                             </div>
+
+                            {showPatientForm && (
+                                <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm space-y-4 animate-in fade-in slide-in-from-top-2">
+                                    <h3 className="font-bold text-sm text-slate-700">Enregistrer un patient (Appel/Direct)</h3>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-slate-400 uppercase">Prénom</label>
+                                            <input
+                                                className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm"
+                                                placeholder="Jean"
+                                                value={patientForm.firstName}
+                                                onChange={e => setPatientForm({ ...patientForm, firstName: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-slate-400 uppercase">Nom</label>
+                                            <input
+                                                className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm"
+                                                placeholder="DUPONT"
+                                                value={patientForm.lastName}
+                                                onChange={e => setPatientForm({ ...patientForm, lastName: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-slate-400 uppercase">Téléphone</label>
+                                        <input
+                                            className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm"
+                                            placeholder="06 12 34 56 78"
+                                            type="tel"
+                                            value={patientForm.phone}
+                                            onChange={e => setPatientForm({ ...patientForm, phone: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-slate-400 uppercase">Motif</label>
+                                        <input
+                                            className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm"
+                                            placeholder="Ex: Douleur cervicale"
+                                            value={patientForm.motif}
+                                            onChange={e => setPatientForm({ ...patientForm, motif: e.target.value })}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handlePatientSave}
+                                        disabled={patientSaving}
+                                        className="w-full py-3 text-sm font-bold text-white rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 transition shadow-md"
+                                    >
+                                        {patientSaving ? 'Enregistrement...' : 'Ajouter à la liste'}
+                                    </button>
+                                </div>
+                            )}
                             <div className="space-y-3">
                                 {loading ? (
                                     <p className="text-center text-slate-400 py-12">Chargement...</p>
@@ -189,6 +296,40 @@ export default function Dashboard() {
                                                 <div className="flex items-center gap-1.5 mt-1">
                                                     <span className="material-symbols-outlined text-slate-400" style={{ fontSize: 13 }}>call</span>
                                                     <a href={`tel:${p.phone}`} className="text-slate-500 hover:text-slate-700 transition" style={{ fontSize: 12 }}>{p.phone}</a>
+                                                </div>
+
+                                                {/* Claim status / Actions */}
+                                                <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                                                    {p.claimedBy ? (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold flex items-center gap-1 border border-blue-100">
+                                                                <span className="material-symbols-outlined text-[12px]">person</span>
+                                                                PRIS PAR {p.claimedBy.toUpperCase()}
+                                                            </span>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleClaim(p.id, null); }}
+                                                                className="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition px-1"
+                                                            >
+                                                                Libérer
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-[10px] font-bold text-slate-400 mr-0.5">PRENDRE :</span>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleClaim(p.id, 'Leslie'); }}
+                                                                className="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 rounded-md text-[10px] font-bold transition border border-transparent hover:border-emerald-100"
+                                                            >
+                                                                Leslie
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleClaim(p.id, 'Ruben'); }}
+                                                                className="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 rounded-md text-[10px] font-bold transition border border-transparent hover:border-emerald-100"
+                                                            >
+                                                                Ruben
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <button

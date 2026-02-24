@@ -8,6 +8,7 @@ export interface WaitingListEntry {
   phone: string;
   motif: string;
   createdAt: string;
+  claimedBy?: string | null;
 }
 
 export interface BlogPost {
