@@ -5,11 +5,13 @@ import Link from 'next/link';
 
 export default function Home() {
   const [count, setCount] = useState<number | null>(null);
+  const [posts, setPosts] = useState<any[]>([]);
   const [formData, setFormData] = useState({ nom: '', prenom: '', phone: '', motif: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     fetch('/api/waiting-list').then(r => r.json()).then(d => setCount(d.count)).catch(() => { });
+    fetch('/api/blog').then(r => r.json()).then(d => Array.isArray(d) && setPosts(d.slice(0, 3))).catch(() => { });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,26 +152,31 @@ export default function Home() {
             <a className="text-primary text-sm font-bold" href="#">Voir tout</a>
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4">
-            {[
-              {
-                title: 'Prévenir le mal de dos au quotidien',
-                desc: 'Découvrez les gestes simples pour protéger votre colonne vertébrale...',
-                img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDL-wcf_vURlbU4BlwDWMHgcOBqp5nnxFk_ix-Z90YkHtau3hACUwGmyShh0HcVwlxzk2etoq2tE1eqslUeLwx_U_gmR2UhdJHk01pZI5Ca9jXDGH-_-0GGp3b4taR92RtiKnDBKs5GkivrYxOf45_K7-rdoAzbd2dT2264jYC4WlxF5pW5ALiShlXqZhQh_zIme7ZWMxhL1TrjB5_u6AMJuzlo-bp9JFkztlF29gogZHfLLUmb4ZT5-buFxHVtV8us0U6lrt52tNI'
-              },
-              {
-                title: 'Rééducation après une entorse de cheville',
-                desc: 'Les étapes clés pour reprendre le sport en toute sécurité après un traumatisme...',
-                img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBjwErnaYJ2nkUX2Dr7GZBeV3UL46Y0O0SNlgkT8dje0OxaIyBpL5qnr0HQtM08u0r-6KjTElqZMWPAtyhyqHJDP45YMrXaWTjSOK8PKdm8G8pThZfWYn9liunXrPI02BuiTS4iLcbmcwWKwLE4dyI_ttxse8nOq9pBFCbgL2UPjMj54M_FjPqir3cRKpiszUXhOx1ssqsOiibEiQmsRpHf5LXvrlGzefAkhqy9SoXlH6yMoq6vyFKGLcCzLHjzOobja4hNTcRJYGk'
-              }
-            ].map((post, i) => (
-              <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200" style={{ minWidth: 280 }}>
-                <img alt={post.title} className="w-full object-cover" style={{ height: 160 }} src={post.img} />
-                <div className="p-4">
-                  <h5 className="font-bold text-slate-900 mb-2 leading-tight">{post.title}</h5>
-                  <p className="text-slate-500 text-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.desc}</p>
-                </div>
-              </div>
-            ))}
+            {posts.length > 0 ? (
+              posts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 block transition-transform hover:scale-[1.02]"
+                  style={{ minWidth: 280 }}
+                >
+                  <img
+                    alt={post.title}
+                    className="w-full object-cover"
+                    style={{ height: 160 }}
+                    src={(post.cover_url || post.coverUrl) || 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80'}
+                  />
+                  <div className="p-4">
+                    <h5 className="font-bold text-slate-900 mb-2 leading-tight">{post.title}</h5>
+                    <p className="text-slate-500 text-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {post.excerpt || (post.content ? post.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : '')}
+                    </p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-slate-400 text-sm py-8 text-center w-full italic">Plus d'articles arrivent bientôt...</p>
+            )}
           </div>
         </section>
 

@@ -24,6 +24,10 @@ export default function Dashboard() {
     const [patientForm, setPatientForm] = useState({ firstName: '', lastName: '', phone: '', motif: '' });
     const [patientSaving, setPatientSaving] = useState(false);
 
+    // AI Generation state
+    const [aiTopic, setAiTopic] = useState('');
+    const [generatingAI, setGeneratingAI] = useState(false);
+
     const fetchPatients = async () => {
         try {
             const res = await fetch('/api/admin/waiting-list');
@@ -99,6 +103,43 @@ export default function Dashboard() {
             console.error(e);
         } finally {
             setPatientSaving(false);
+        }
+    };
+
+    const handleAIGenerate = async () => {
+        console.log('handleAIGenerate called', { aiTopic });
+        if (!aiTopic) {
+            alert('Veuillez entrer un sujet pour l\'IA (ex: Mal de dos)');
+            return;
+        }
+        setGeneratingAI(true);
+        try {
+            const res = await fetch('/api/admin/blog/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic: aiTopic }),
+            });
+            const data = await res.json();
+            console.log('AI Generation response:', { ok: res.ok, data });
+            if (res.ok) {
+                setBlogForm({
+                    title: data.title,
+                    slug: data.slug,
+                    excerpt: data.excerpt,
+                    content: data.content,
+                    cover_url: data.cover_url,
+                    status: 'draft'
+                });
+                setAiTopic('');
+                alert('Article généré avec succès ! Révisez les champs ci-dessous.');
+            } else {
+                alert(data.error || 'Erreur lors de la génération');
+            }
+        } catch (e) {
+            console.error('AI Generation error:', e);
+            alert('Erreur réseau');
+        } finally {
+            setGeneratingAI(false);
         }
     };
 
@@ -370,6 +411,45 @@ export default function Dashboard() {
                         {showBlogForm && (
                             <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-4 shadow-sm space-y-3">
                                 <h3 className="font-bold text-sm text-slate-700">{editingId ? 'Modifier l\'article' : 'Nouvel article'}</h3>
+
+                                {!editingId && (
+                                    <div className="p-4 rounded-xl space-y-3 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-blue-600 animate-pulse">magic_button</span>
+                                            <label className="text-xs font-bold text-blue-900 uppercase">Assistant IA</label>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                className="flex-1 border border-slate-200 shadow-sm rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-200 outline-none"
+                                                placeholder="Sujet (ex: Mal de dos au bureau)"
+                                                value={aiTopic}
+                                                onChange={e => setAiTopic(e.target.value)}
+                                                disabled={generatingAI}
+                                            />
+                                            <button
+                                                onClick={handleAIGenerate}
+                                                disabled={generatingAI}
+                                                className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1 shrink-0 ${generatingAI || !aiTopic
+                                                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                        : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+                                                    }`}
+                                            >
+                                                {generatingAI ? (
+                                                    <>
+                                                        <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+                                                        Rédaction...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                                                        Générer
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] text-blue-400 font-medium">L'IA rédigera le texte et créera une image pro.</p>
+                                    </div>
+                                )}
 
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-slate-400 uppercase">Titre</label>

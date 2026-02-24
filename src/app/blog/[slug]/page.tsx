@@ -39,9 +39,13 @@ export default async function BlogPostPage({
             </header>
 
             <main className="max-w-2xl mx-auto px-4 pb-20 pt-6">
-                {post.cover_url && (
+                {(post.cover_url || (post as any).coverUrl) && (
                     <div className="rounded-2xl overflow-hidden mb-6" style={{ height: 240 }}>
-                        <img src={post.cover_url} alt={post.title} className="w-full h-full object-cover" />
+                        <img
+                            src={post.cover_url || (post as any).coverUrl}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                 )}
 
