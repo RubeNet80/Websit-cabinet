@@ -14,13 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const adminEmail = process.env.ADMIN_EMAIL;
                 const adminHash = process.env.ADMIN_PASSWORD_HASH;
 
-                console.log('--- Login Attempt Debug ---');
-                console.log('Target Email:', adminEmail);
-                console.log('Provided Email:', credentials?.email);
-                console.log('Hash configured:', !!adminHash);
-
                 if (!adminEmail || !adminHash) {
-                    console.error('Admin credentials not configured in environment variables');
                     return null;
                 }
 

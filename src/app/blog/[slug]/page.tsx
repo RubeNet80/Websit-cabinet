@@ -13,6 +13,17 @@ async function getPost(slug: string): Promise<BlogPost | null> {
     }
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const post = await getPost(slug);
+    if (!post) return { title: 'Article non trouvé' };
+    return {
+        title: `${post.title} | Blog Cabinet Kiné`,
+        description: post.excerpt || post.title,
+    };
+}
+
+
 export default async function BlogPostPage({
     params,
 }: {

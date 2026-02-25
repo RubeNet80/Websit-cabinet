@@ -7,7 +7,7 @@ const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Cabinet de Kinésithérapie | Saint-Sauveur-en-Rue",
-  description: "Soins de kinésithérapie générale pour toute la famille.",
+  description: "Soins de kinésithérapie générale.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

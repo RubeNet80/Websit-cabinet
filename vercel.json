@@ -1,0 +1,29 @@
+{
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                },
+                {
+                    "key": "Permissions-Policy",
+                    "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+                },
+                {
+                    "key": "Content-Security-Policy",
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' data: localhost:3000 lh3.googleusercontent.com images.unsplash.com qkvkkyhnstsoyhffayip.supabase.co qkvkkyhnstsoyhffayip.supabase.in; font-src 'self' fonts.gstatic.com fonts.googleapis.com; connect-src 'self' qkvkkyhnstsoyhffayip.supabase.co qkvkkyhnstsoyhffayip.supabase.in; frame-src 'self' www.openstreetmap.org;"
+                }
+            ]
+        }
+    ]
+}

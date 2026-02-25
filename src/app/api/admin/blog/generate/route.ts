@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import OpenAI from 'openai';
+// import OpenAI from 'openai'; // Removed in favor of Google AI
 import { supabaseAdmin } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -22,28 +22,32 @@ export async function POST(request: Request) {
         }
 
         const genAIKey = process.env.GOOGLE_GENAI_API_KEY;
-        const openaiKey = process.env.OPENAI_API_KEY;
+        // const openaiKey = process.env.OPENAI_API_KEY; // Deprecated image generation provider
 
         if (!genAIKey) {
             return NextResponse.json({ error: 'Clé API Gemini non configurée (GOOGLE_GENAI_API_KEY)' }, { status: 500 });
         }
 
-        // Prompt preparation
+        // Prompt preparation with strict JSON constraints
         const prompt = `
             Tu es un physiothérapeute expert (masseur-kinésithérapeute). 
-            Rédige un article de blog vulgarisé et intéressant sur le sujet suivant : "${topic}".
-            L'article doit être en français, professionnel mais accessible.
-            Inclus :
-            - Un titre accrocheur.
-            - Un court résumé (excerpt).
-            - Un contenu détaillé structuré con tags HTML (p, h2, h3, ul, li).
-            - Ne mets pas de balises markdown comme \`\`\`html au début ou à la fin.
-            Format de sortie souhaité (JSON uniquement) :
+            Rédige un article de blog vulgarisé, informatif et intéressant sur le sujet suivant : "${topic}".
+            L'article doit être en français, avec un ton professionnel, bienveillant et pédagogique.
+            
+            STRUCTURE :
+            1. Un titre (TITLE) accrocheur mais médicalement précis.
+            2. Un résumé (EXCERPT) captivant de 2-3 phrases.
+            3. Un contenu (CONTENT) structuré en sections (utilisant h2, h3, p, ul, li). Concentre-toi sur des conseils pratiques et la compréhension de la pathologie.
+            4. Une description d'image (IMAGEPROMPT) en anglais pour DALL-E/Midjourney décrivant une photo de haute qualité d'un cabinet de kiné moderne liée au sujet.
+
+            IMPORTANT : Réponds UNIQUEMENT avec un objet JSON valide. Ne conclus pas le JSON dans des balises markdown.
+            
+            Schema JSON :
             {
-                "title": "Titre de l'article",
-                "excerpt": "Court résumé...",
-                "content": "Contenu HTML completo...",
-                "imagePrompt": "Detailed description in english to generate a realistic physiotherapy photo related to this topic"
+                "title": "string",
+                "excerpt": "string",
+                "content": "string (valid HTML bits)",
+                "imagePrompt": "string"
             }
         `;
 
@@ -87,54 +91,57 @@ export async function POST(request: Request) {
             generatedData = JSON.parse(jsonMatch[0]);
         }
 
-        // 2. Generate Image with DALL-E if key exists
-        let coverUrl = 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80'; // Fallback
+        // 2. Unsplash "Smart Picker" Logic (Verified Physiotherapy Photos)
+        const UNSPLASH_IDS = [
+            '1597452485669-2c7bb5fef90d',
+            '1544367567-0f2fcb009e0b',
+            '1581091226825-a6a2a5aee158'
+        ];
 
-        if (openaiKey) {
-            try {
-                const openai = new OpenAI({ apiKey: openaiKey });
-                const imageResponse = await openai.images.generate({
-                    model: "dall-e-3",
-                    prompt: generatedData.imagePrompt || `Professional physiotherapy session for ${topic}, high quality, realistic medical photography`,
-                    n: 1,
-                    size: "1024x1024",
-                });
+        let coverUrl = 'https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d?auto=format&fit=crop&q=80'; // Working Fallback
 
-                const imageUrl = imageResponse.data?.[0]?.url;
+        try {
+            console.log('Selecting Unsplash photo for the blog...');
 
-                if (imageUrl) {
-                    // 3. Upload to Supabase Storage if possible
-                    try {
-                        const imgFetch = await fetch(imageUrl);
-                        const buffer = await imgFetch.arrayBuffer();
-                        const fileName = `blog/${uuidv4()}.png`;
+            // Randomly pick a high-quality photo from our verified set
+            const randomId = UNSPLASH_IDS[Math.floor(Math.random() * UNSPLASH_IDS.length)];
+            const imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1200`;
 
-                        const { data: uploadData, error: uploadError } = await supabaseAdmin
-                            .storage
-                            .from('blog-images')
-                            .upload(fileName, buffer, {
-                                contentType: 'image/png',
-                                upsert: true
-                            });
+            // 3. Upload to Supabase Storage to make it permanent
+            console.log(`Downloading Unsplash image: ${randomId}`);
+            const imgFetch = await fetch(imageUrl);
 
-                        if (!uploadError) {
-                            const { data: { publicUrl } } = supabaseAdmin
-                                .storage
-                                .from('blog-images')
-                                .getPublicUrl(fileName);
-                            coverUrl = publicUrl;
-                        } else {
-                            console.error('Storage upload error:', uploadError);
-                            coverUrl = imageUrl; // Fallback to OpenAI temporary link
-                        }
-                    } catch (storageErr) {
-                        console.error('Storage integration error:', storageErr);
-                        coverUrl = imageUrl;
-                    }
+            if (imgFetch.ok) {
+                const arrayBuffer = await imgFetch.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const fileName = `blog/${uuidv4()}.png`;
+
+                console.log(`Uploading Unsplash image to Storage: ${fileName} (${buffer.byteLength} bytes)`);
+                const { data: uploadData, error: uploadError } = await supabaseAdmin
+                    .storage
+                    .from('blog-images')
+                    .upload(fileName, buffer, {
+                        contentType: 'image/png',
+                        upsert: true
+                    });
+
+                if (!uploadError) {
+                    const { data } = supabaseAdmin
+                        .storage
+                        .from('blog-images')
+                        .getPublicUrl(fileName);
+                    coverUrl = data.publicUrl;
+                    console.log('Unsplash image hosted successfully in Supabase:', coverUrl);
+                } else {
+                    console.error('Supabase Storage upload error:', uploadError);
+                    coverUrl = imageUrl; // Fallback to direct Unsplash link
                 }
-            } catch (imageErr) {
-                console.error('Image generation error:', imageErr);
+            } else {
+                console.warn('Failed to fetch image from Unsplash. Using fallback.');
             }
+        } catch (imageErr: any) {
+            console.error('Image handling error:', imageErr.message);
+            // Fallback is already set
         }
 
         // 4. Return results

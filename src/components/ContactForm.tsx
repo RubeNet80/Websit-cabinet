@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 const ContactForm = () => {
-    const [formData, setFormData] = useState({ firstName: '', lastName: '', phone: '', motif: '' });
+    const [formData, setFormData] = useState({ nom: '', prenom: '', phone: '', motif: '' });
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -13,76 +13,53 @@ const ContactForm = () => {
             const res = await fetch('/api/waiting-list', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ firstName: formData.prenom, lastName: formData.nom, phone: formData.phone, motif: formData.motif })
             });
-            setStatus(res.ok ? 'success' : 'error');
-            if (res.ok) setFormData({ firstName: '', lastName: '', phone: '', motif: '' });
+            if (res.ok) {
+                setStatus('success');
+                setFormData({ nom: '', prenom: '', phone: '', motif: '' });
+            } else { setStatus('error'); }
         } catch { setStatus('error'); }
     };
 
-    const inp = (style?: React.CSSProperties): React.CSSProperties => ({
-        width: '100%', padding: '13px 16px', borderRadius: 12, border: '1.5px solid #e2e8f0',
-        fontSize: 15, color: '#0f172a', background: '#f8fafc', outline: 'none',
-        transition: 'border-color 0.2s', fontFamily: 'inherit', ...style
-    });
-
-    const label: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 6 };
-
     return (
-        <section id="contact" style={{ padding: '80px 24px', background: '#fff' }}>
-            <div style={{ maxWidth: 640, margin: '0 auto' }}>
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: 48 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#e8f4fd', color: '#137fec', borderRadius: 999, padding: '4px 14px', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 16 }}>
-                        Inscription
-                    </div>
-                    <h2 style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em', marginBottom: 10 }}>
-                        Rejoindre la liste d'attente
-                    </h2>
-                    <p style={{ color: '#64748b', fontSize: 15 }}>Nous vous contacterons dès qu'un créneau se libère.</p>
-                </div>
+        <section className="px-4 mt-12 mb-12" id="contact">
+            <div className="rounded-2xl p-6 border max-w-2xl mx-auto" style={{ background: 'rgba(19,127,236,0.05)', borderColor: 'rgba(19,127,236,0.1)' }}>
+                <h3 className="text-2xl font-black mb-2 text-slate-900">Contactez-nous</h3>
+                <p className="text-slate-600 text-sm mb-6">Un motif particulier ? Remplissez ce formulaire et nous vous rappellerons.</p>
 
                 {status === 'success' ? (
-                    <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 20, padding: '40px 32px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
-                        <h3 style={{ fontWeight: 800, color: '#166534', fontSize: 18, marginBottom: 8 }}>Inscription confirmée !</h3>
-                        <p style={{ color: '#15803d', marginBottom: 20 }}>Nous vous contacterons dans les plus brefs délais.</p>
-                        <button onClick={() => setStatus('idle')} style={{ background: '#137fec', color: '#fff', borderRadius: 999, padding: '10px 24px', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: 14 }}>
-                            Inscrire une autre personne
-                        </button>
+                    <div className="bg-green-50 border border-green-200 p-6 rounded-xl text-center">
+                        <p className="font-bold text-green-800 text-lg mb-2">✅ Inscription confirmée !</p>
+                        <p className="text-green-700 text-sm mb-4">Nous vous contacterons dans les plus brefs délais.</p>
+                        <button onClick={() => setStatus('idle')} className="text-sm font-bold text-primary">Nouvelle inscription</button>
                     </div>
                 ) : (
-                    <div style={{ background: '#fff', borderRadius: 24, border: '1.5px solid #e9f0fb', padding: '40px 36px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-                        <form onSubmit={handleSubmit}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                                <div>
-                                    <label style={label}>Prénom</label>
-                                    <input required style={inp()} value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} placeholder="Jean" />
-                                </div>
-                                <div>
-                                    <label style={label}>Nom</label>
-                                    <input required style={inp()} value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} placeholder="Dupont" />
-                                </div>
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase px-1">Nom</label>
+                                <input className="w-full bg-white border border-slate-200 rounded-lg py-3 px-3 text-sm" placeholder="Dupont" type="text" required value={formData.nom} onChange={e => setFormData({ ...formData, nom: e.target.value })} />
                             </div>
-                            <div style={{ marginBottom: 16 }}>
-                                <label style={label}>Téléphone</label>
-                                <input required type="tel" style={inp()} value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="06 00 00 00 00" />
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase px-1">Prénom</label>
+                                <input className="w-full bg-white border border-slate-200 rounded-lg py-3 px-3 text-sm" placeholder="Jean" type="text" required value={formData.prenom} onChange={e => setFormData({ ...formData, prenom: e.target.value })} />
                             </div>
-                            <div style={{ marginBottom: 28 }}>
-                                <label style={label}>Motif de consultation</label>
-                                <textarea required rows={3} style={inp({ resize: 'none', height: 'auto' })} value={formData.motif} onChange={e => setFormData({ ...formData, motif: e.target.value })} placeholder="Douleur lombaire, rééducation..." />
-                            </div>
-                            <button type="submit" disabled={status === 'loading'} style={{
-                                width: '100%', background: '#137fec', color: '#fff', borderRadius: 999,
-                                padding: '15px', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                                boxShadow: '0 4px 16px rgba(19,127,236,0.3)', opacity: status === 'loading' ? 0.7 : 1,
-                                transition: 'opacity 0.2s', fontFamily: 'inherit'
-                            }}>
-                                {status === 'loading' ? 'Envoi en cours...' : '→ Valider l\'inscription'}
-                            </button>
-                            {status === 'error' && <p style={{ color: '#dc2626', textAlign: 'center', marginTop: 12, fontSize: 13 }}>Une erreur est survenue. Veuillez réessayer.</p>}
-                        </form>
-                    </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-500 uppercase px-1">Téléphone</label>
+                            <input className="w-full bg-white border border-slate-200 rounded-lg py-3 px-3 text-sm" placeholder="06 00 00 00 00" type="tel" required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-500 uppercase px-1">Motif de consultation</label>
+                            <textarea className="w-full bg-white border border-slate-200 rounded-lg py-3 px-3 text-sm" placeholder="Description rapide..." rows={3} required value={formData.motif} onChange={e => setFormData({ ...formData, motif: e.target.value })}></textarea>
+                        </div>
+                        <button className="w-full text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 mt-4" style={{ background: '#137fec', boxShadow: '0 4px 14px rgba(19,127,236,0.3)' }} type="submit" disabled={status === 'loading'}>
+                            {status === 'loading' ? 'Envoi...' : 'Envoyer ma demande'}
+                            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>send</span>
+                        </button>
+                        {status === 'error' && <p className="text-red-500 text-center mt-2 text-sm italic">Oups, une erreur est survenue.</p>}
+                    </form>
                 )}
             </div>
         </section>

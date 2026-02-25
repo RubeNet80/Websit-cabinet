@@ -2,54 +2,28 @@ import React from 'react';
 
 const Hero = () => {
     return (
-        <section style={{ background: '#f6f8fb', padding: '80px 24px 72px', textAlign: 'center' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
-                {/* Pill badge */}
-                <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    background: '#e8f4fd', color: '#137fec', borderRadius: 999,
-                    padding: '5px 16px', fontSize: 12.5, fontWeight: 700,
-                    letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 28
-                }}>
-                    <span style={{ width: 7, height: 7, background: '#137fec', borderRadius: '50%', display: 'inline-block' }}></span>
-                    Saint-Sauveur-en-Rue · Liste d'attente en temps réel
-                </div>
-
-                {/* Title */}
-                <h1 style={{
-                    fontSize: 52, fontWeight: 900, color: '#0f172a',
-                    letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 20
-                }}>
-                    Cabinet de<br />
-                    <span style={{ color: '#137fec' }}>Kinésithérapie</span>
-                </h1>
-
-                {/* Subtitle */}
-                <p style={{ fontSize: 18, color: '#64748b', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 40px', fontWeight: 400 }}>
-                    Soins de kinésithérapie générale pour toute la famille. Suivez notre liste d'attente en temps réel et inscrivez-vous en un clic.
+        <section className="relative overflow-hidden" style={{ height: 420 }}>
+            <img
+                alt="Cabinet de Kinésithérapie"
+                className="absolute inset-0 h-full w-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJGrx3p7cFyVXQMP8fIp-6I3dBdbCtaVHUCyj7fi4K2KkjKzWbGX-BaCenoTW8_GYlEXm2x7W3f6yjckXzLzv6z1Q9GEmu1rBjv07R2K0zTz5Vw1uBRJijd18hz8h7IxQe7FwIVmfMMJDzZaBbkyq0HJLP-t3e7CfF7e4_q8MEd_Csrse5JdjGMVfUIHjqEwfYU-iz_3j_U1bKe8hggad4Gbf1UV0W3JaU90Y0oZRNYyx_DFguiziNbRjmhsALUdhPk9h_ARdt61o"
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-6 pb-12" style={{ background: 'linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.4) 50%, transparent 100%)' }}>
+                <h2 className="text-white text-3xl font-extrabold leading-tight mb-3">
+                    Cabinet de Kinésithérapie Saint-Sauveur-en-Rue
+                </h2>
+                <p className="text-slate-200 text-lg mb-6 leading-snug" style={{ maxWidth: 320 }}>
+                    Soins de kinésithérapie générale.
                 </p>
-
-                {/* CTAs */}
-                <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <a href="#contact" style={{
-                        background: '#137fec', color: '#fff', borderRadius: 999, padding: '15px 36px',
-                        fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
-                        boxShadow: '0 4px 20px rgba(19,127,236,0.32)', transition: 'transform 0.15s'
-                    }}>
-                        📋 Rejoindre la liste
+                <div className="flex gap-3">
+                    <a
+                        className="font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 text-white"
+                        style={{ background: '#137fec' }}
+                        href="#contact"
+                    >
+                        Prendre RDV
+                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>calendar_month</span>
                     </a>
-                    <a href="#attente" style={{
-                        background: '#fff', color: '#0f172a', borderRadius: 999, padding: '15px 36px',
-                        fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
-                        border: '1.5px solid #e2e8f0', transition: 'border-color 0.2s'
-                    }}>
-                        👁️ Voir l'attente
-                    </a>
-                </div>
-
-                {/* Address pill */}
-                <div style={{ marginTop: 48, display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '10px 22px', border: '1px solid #e9eef4', fontSize: 13.5, color: '#6b7280', fontWeight: 500, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                    📍 2 Montée du Village d'Enfants, 42220 Saint-Sauveur-en-Rue
                 </div>
             </div>
         </section>
