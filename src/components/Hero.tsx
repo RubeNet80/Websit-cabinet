@@ -1,12 +1,15 @@
 import React from 'react';
+import Image from 'next/image';
 
 const Hero = () => {
     return (
         <section className="relative overflow-hidden" style={{ height: 420 }}>
-            <img
+            <Image
                 alt="Cabinet de Kinésithérapie"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="object-cover"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJGrx3p7cFyVXQMP8fIp-6I3dBdbCtaVHUCyj7fi4K2KkjKzWbGX-BaCenoTW8_GYlEXm2x7W3f6yjckXzLzv6z1Q9GEmu1rBjv07R2K0zTz5Vw1uBRJijd18hz8h7IxQe7FwIVmfMMJDzZaBbkyq0HJLP-t3e7CfF7e4_q8MEd_Csrse5JdjGMVfUIHjqEwfYU-iz_3j_U1bKe8hggad4Gbf1UV0W3JaU90Y0oZRNYyx_DFguiziNbRjmhsALUdhPk9h_ARdt61o"
+                fill
+                priority
             />
             <div className="absolute inset-0 flex flex-col justify-end p-6 pb-12" style={{ background: 'linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.4) 50%, transparent 100%)' }}>
                 <h2 className="text-white text-3xl font-extrabold leading-tight mb-3">

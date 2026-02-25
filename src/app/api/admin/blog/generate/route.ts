@@ -64,9 +64,10 @@ export async function POST(request: Request) {
                 const model = genAI.getGenerativeModel({ model: modelName });
                 result = await model.generateContent(prompt);
                 if (result) break;
-            } catch (err: any) {
-                console.error(`Gemini ${modelName} failed:`, err.message);
-                lastError = err;
+            } catch (err) {
+                const error = err as Error;
+                console.error(`Gemini ${modelName} failed:`, error.message);
+                lastError = error;
             }
         }
 
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
                 const fileName = `blog/${uuidv4()}.png`;
 
                 console.log(`Uploading Unsplash image to Storage: ${fileName} (${buffer.byteLength} bytes)`);
-                const { data: uploadData, error: uploadError } = await supabaseAdmin
+                const { error: uploadError } = await supabaseAdmin
                     .storage
                     .from('blog-images')
                     .upload(fileName, buffer, {
@@ -139,8 +140,9 @@ export async function POST(request: Request) {
             } else {
                 console.warn('Failed to fetch image from Unsplash. Using fallback.');
             }
-        } catch (imageErr: any) {
-            console.error('Image handling error:', imageErr.message);
+        } catch (imageErr) {
+            const error = imageErr as Error;
+            console.error('Image handling error:', error.message);
             // Fallback is already set
         }
 
@@ -153,8 +155,9 @@ export async function POST(request: Request) {
             slug: generatedData.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
         });
 
-    } catch (err: any) {
-        console.error('Generation Error:', err);
-        return NextResponse.json({ error: `Erreur de génération : ${err.message}` }, { status: 500 });
+    } catch (err) {
+        const error = err as Error;
+        console.error('Generation Error:', error);
+        return NextResponse.json({ error: `Erreur de génération : ${error.message}` }, { status: 500 });
     }
 }

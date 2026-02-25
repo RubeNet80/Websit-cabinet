@@ -21,7 +21,7 @@ const Header = () => {
             <nav className="flex gap-6 overflow-x-auto px-4 pb-3 hide-scrollbar text-sm font-medium border-t border-slate-100 pt-2">
                 <a className="text-primary whitespace-nowrap font-bold" href="#">Accueil</a>
                 <a className="text-slate-500 whitespace-nowrap" href="#praticiens">Praticiens</a>
-                <a className="text-slate-500 whitespace-nowrap" href="#attente">File d'attente</a>
+                <a className="text-slate-500 whitespace-nowrap" href="#attente">File d&apos;attente</a>
                 <a className="text-slate-500 whitespace-nowrap" href="#blog">Blog</a>
                 <a className="text-slate-500 whitespace-nowrap" href="#contact">Contact</a>
             </nav>

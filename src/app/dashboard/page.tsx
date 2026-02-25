@@ -3,13 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { WaitingListEntry, BlogPost } from '@/lib/db';
+import Image from 'next/image';
+import { BlogPost } from '@/lib/supabase';
 
 type Tab = 'dashboard' | 'blog';
 
+interface Patient {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    motif: string;
+    createdAt: string;
+    claimedBy?: string | null;
+}
+
 export default function Dashboard() {
     const [tab, setTab] = useState<Tab>('dashboard');
-    const [patients, setPatients] = useState<WaitingListEntry[]>([]);
+    const [patients, setPatients] = useState<Patient[]>([]);
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -34,7 +45,15 @@ export default function Dashboard() {
             if (res.ok) {
                 const data = await res.json();
                 // Normalize Supabase snake_case → camelCase
-                setPatients(data.map((p: any) => ({
+                setPatients(data.map((p: {
+                    id: string;
+                    first_name: string;
+                    last_name: string;
+                    phone: string;
+                    motif: string;
+                    created_at: string;
+                    claimed_by?: string | null;
+                }) => ({
                     id: p.id,
                     firstName: p.first_name,
                     lastName: p.last_name,
@@ -248,7 +267,7 @@ export default function Dashboard() {
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-bold flex items-center gap-2">
                                     <span className="material-symbols-outlined text-blue-600">list_alt</span>
-                                    Liste d'Attente
+                                    Liste d&apos;Attente
                                 </h2>
                                 <div className="flex gap-2">
                                     <button
@@ -430,8 +449,8 @@ export default function Dashboard() {
                                                 onClick={handleAIGenerate}
                                                 disabled={generatingAI}
                                                 className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1 shrink-0 ${generatingAI || !aiTopic
-                                                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                                                        : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+                                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                    : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
                                                     }`}
                                             >
                                                 {generatingAI ? (
@@ -447,14 +466,14 @@ export default function Dashboard() {
                                                 )}
                                             </button>
                                         </div>
-                                        <p className="text-[10px] text-blue-400 font-medium">L'IA rédigera le texte et créera une image pro.</p>
+                                        <p className="text-[10px] text-blue-400 font-medium">L&apos;IA rédigera le texte et créera une image pro.</p>
                                     </div>
                                 )}
 
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-slate-400 uppercase">Titre</label>
                                     <input
-                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm" placeholder="Titre de l'article"
+                                        className="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm" placeholder="Titre de l&apos;article"
                                         value={blogForm.title}
                                         onChange={e => setBlogForm(f => ({ ...f, title: e.target.value, slug: editingId ? f.slug : generateSlug(e.target.value) }))}
                                     />
@@ -539,8 +558,13 @@ export default function Dashboard() {
                                     {posts.map(post => (
                                         <div key={post.id} className="p-4 flex items-center gap-4">
                                             {post.cover_url && (
-                                                <div className="rounded-lg overflow-hidden shrink-0" style={{ width: 48, height: 48 }}>
-                                                    <img alt={post.title} className="w-full h-full object-cover" src={post.cover_url} />
+                                                <div className="rounded-lg overflow-hidden shrink-0 relative" style={{ width: 48, height: 48 }}>
+                                                    <Image
+                                                        alt={post.title}
+                                                        className="object-cover"
+                                                        src={post.cover_url}
+                                                        fill
+                                                    />
                                                 </div>
                                             )}
                                             <div className="flex-1 min-w-0">

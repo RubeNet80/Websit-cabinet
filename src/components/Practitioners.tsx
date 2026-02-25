@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const Practitioners = () => {
     return (
@@ -20,8 +21,13 @@ const Practitioners = () => {
                         }
                     ].map((p, i) => (
                         <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                            <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 shrink-0" style={{ borderColor: 'rgba(19,127,236,0.2)' }}>
-                                <img alt={p.name} className="w-full h-full object-cover" src={p.img} />
+                            <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 shrink-0 relative" style={{ borderColor: 'rgba(19,127,236,0.2)' }}>
+                                <Image
+                                    alt={p.name}
+                                    src={p.img}
+                                    fill
+                                    className="object-cover"
+                                />
                             </div>
                             <div className="flex-1">
                                 <h4 className="font-bold text-slate-900">{p.name}</h4>

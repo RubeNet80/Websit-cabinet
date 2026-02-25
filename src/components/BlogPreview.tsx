@@ -2,9 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+
+import { BlogPost } from '@/lib/supabase';
 
 const BlogPreview = () => {
-    const [posts, setPosts] = useState<any[]>([]);
+    const [posts, setPosts] = useState<BlogPost[]>([]);
 
     useEffect(() => {
         fetch('/api/blog').then(r => r.json()).then(d => Array.isArray(d) && setPosts(d.slice(0, 3))).catch(() => { });
@@ -30,10 +33,11 @@ const BlogPreview = () => {
                                 style={{ minWidth: 280, maxWidth: 320 }}
                             >
                                 <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-100">
-                                    <img
+                                    <Image
                                         alt={post.title}
-                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                                        src={(post.cover_url || post.coverUrl) || 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80'}
+                                        className="object-cover transition-transform duration-500 hover:scale-110"
+                                        src={post.cover_url || 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80'}
+                                        fill
                                     />
                                 </div>
                                 <div className="p-4">
@@ -45,7 +49,7 @@ const BlogPreview = () => {
                             </Link>
                         ))
                     ) : (
-                        <p className="text-slate-400 text-sm py-8 text-center w-full italic">Plus d'articles arrivent bientôt...</p>
+                        <p className="text-slate-400 text-sm py-8 text-center w-full italic">Plus d&apos;articles arrivent bientôt...</p>
                     )}
                 </div>
             </div>

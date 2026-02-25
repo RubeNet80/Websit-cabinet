@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 // GET — posts publicados (público) o todos (admin)
-export async function GET(request: Request) {
+export async function GET() {
     const session = await auth();
     const isAdmin = !!session;
 

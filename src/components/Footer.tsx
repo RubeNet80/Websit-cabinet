@@ -8,7 +8,7 @@ const Footer = () => {
                     <span className="material-symbols-outlined text-primary">location_on</span>
                     <div>
                         <p className="font-bold text-slate-900">Adresse</p>
-                        <p className="text-slate-500 text-sm leading-snug">2 Montée du Village d'Enfants,<br />42220 Saint-Sauveur-en-Rue</p>
+                        <p className="text-slate-500 text-sm leading-snug">2 Montée du Village d&apos;Enfants,<br />42220 Saint-Sauveur-en-Rue</p>
                     </div>
                 </div>
 

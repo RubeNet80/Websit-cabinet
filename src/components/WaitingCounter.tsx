@@ -22,12 +22,12 @@ const WaitingCounter = () => {
                 <h3 className="text-slate-500 text-sm font-medium mb-1">Nombre de personnes actuellement en attente :</h3>
                 <div className="flex items-baseline gap-2 mb-4">
                     <span className="font-black text-slate-900" style={{ fontSize: 48 }}>{count === null ? '...' : count}</span>
-                    <span className="text-slate-400 text-sm italic">Mise à jour à l'instant</span>
+                    <span className="text-slate-400 text-sm italic">Mise à jour à l&apos;instant</span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-lg flex items-start gap-3 border border-slate-100">
                     <span className="material-symbols-outlined text-slate-400" style={{ fontSize: 20 }}>info</span>
                     <p className="text-slate-600 text-xs leading-relaxed">
-                        Nous nous engageons sur la transparence de nos délais. Notre file d'attente est dynamique pour optimiser votre prise en charge.
+                        Nous nous engageons sur la transparence de nos délais. Notre file d&apos;attente est dynamique pour optimiser votre prise en charge.
                     </p>
                 </div>
             </div>

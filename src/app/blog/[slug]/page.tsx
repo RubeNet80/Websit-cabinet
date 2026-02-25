@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BlogPost } from '@/lib/supabase';
@@ -50,12 +51,14 @@ export default async function BlogPostPage({
             </header>
 
             <main className="max-w-2xl mx-auto px-4 pb-20 pt-6">
-                {(post.cover_url || (post as any).coverUrl) && (
-                    <div className="rounded-2xl overflow-hidden mb-6" style={{ height: 240 }}>
-                        <img
-                            src={post.cover_url || (post as any).coverUrl}
+                {post.cover_url && (
+                    <div className="rounded-2xl overflow-hidden mb-6 relative" style={{ height: 240 }}>
+                        <Image
+                            src={post.cover_url}
                             alt={post.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            priority
                         />
                     </div>
                 )}
@@ -85,7 +88,7 @@ export default async function BlogPostPage({
                 )}
 
                 <div className="mt-12 pt-6 border-t border-slate-200 text-center">
-                    <p className="text-slate-500 text-sm mb-4">Besoin d'un rendez-vous ?</p>
+                    <p className="text-slate-500 text-sm mb-4">Besoin d&apos;un rendez-vous ?</p>
                     <Link
                         href="/#contact"
                         className="inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-xl"
