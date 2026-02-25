@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // Singletons initialization
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -10,13 +10,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Only initialize if we have the URL, otherwise export null to avoid crashing during 'vercel build'
-export const supabase = supabaseUrl
+export const supabase = (supabaseUrl
     ? createClient(supabaseUrl, supabaseAnonKey)
-    : null as any;
+    : null) as unknown as SupabaseClient;
 
-export const supabaseAdmin = supabaseUrl
+export const supabaseAdmin = (supabaseUrl
     ? createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey)
-    : null as any;
+    : null) as unknown as SupabaseClient;
 
 
 // Tipos de datos

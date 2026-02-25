@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
