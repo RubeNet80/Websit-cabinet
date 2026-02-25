@@ -6,11 +6,17 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || supabaseAnonKey;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('⚠️ Supabase environment variables are missing.');
+    console.warn('⚠️ Supabase environment variables are missing. Build might fail if pre-rendering routes that use Supabase.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+// Only initialize if we have the URL, otherwise export null to avoid crashing during 'vercel build'
+export const supabase = supabaseUrl
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null as any;
+
+export const supabaseAdmin = supabaseUrl
+    ? createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey)
+    : null as any;
 
 
 // Tipos de datos
