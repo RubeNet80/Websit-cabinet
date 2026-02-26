@@ -38,7 +38,7 @@ export async function POST(request: Request) {
             1. Un titre (TITLE) accrocheur mais médicalement précis.
             2. Un résumé (EXCERPT) captivant de 2-3 phrases.
             3. Un contenu (CONTENT) structuré en sections (utilisant h2, h3, p, ul, li). Concentre-toi sur des conseils pratiques et la compréhension de la pathologie.
-            4. Une description d'image (IMAGEPROMPT) en anglais pour DALL-E/Midjourney décrivant une photo de haute qualité d'un cabinet de kiné moderne liée au sujet.
+            4. Choisis la catégorie d'image la plus pertinente parmi : ['CLINIC', 'MASSAGE', 'EXERCISE', 'ANATOMY', 'WELLNESS'].
 
             IMPORTANT : Réponds UNIQUEMENT avec un objet JSON valide. Ne conclus pas le JSON dans des balises markdown.
             
@@ -47,15 +47,19 @@ export async function POST(request: Request) {
                 "title": "string",
                 "excerpt": "string",
                 "content": "string (valid HTML bits)",
-                "imagePrompt": "string"
+                "category": "string (one of the categories above)"
             }
         `;
 
-        // 1. Generate Text with Gemini
+        // ... (Gemini generation logic) ...
         const genAI = new GoogleGenerativeAI(genAIKey);
 
         let result;
-        const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
+        const modelsToTry = [
+            "gemini-flash-latest",
+            "gemini-2.0-flash-001",
+            "gemini-pro-latest"
+        ];
         let lastError = null;
 
         for (const modelName of modelsToTry) {
@@ -93,23 +97,27 @@ export async function POST(request: Request) {
         }
 
         // 2. Unsplash "Smart Picker" Logic (Verified Physiotherapy Photos)
-        const UNSPLASH_IDS = [
-            '1597452485669-2c7bb5fef90d',
-            '1544367567-0f2fcb009e0b',
-            '1581091226825-a6a2a5aee158'
-        ];
+        const UNSPLASH_CATEGORIES: Record<string, string[]> = {
+            'CLINIC': ['1597452485669-2c7bb5fef90d', '1581091226825-a6a2a5aee158', '1586773860418-d3196f0dd0c8', '1516549655169-df84a0774514'],
+            'MASSAGE': ['1571010263507-6c2e366fd2f5', '1519823551278-64ac92734fb1', '1544367567-0f2fcb009e0b'],
+            'EXERCISE': ['1505751172107-5730d10b434b', '1629909613654-28e377c37b09', '1571013144490-db29f4b1bc4d'],
+            'ANATOMY': ['1532938421977-0adea9b3d16b', '1631815589968-fdb09a223b1a', '1576091160550-217359f42f8c'],
+            'WELLNESS': ['1506126613408-eca67ad46800', '1552196564-9fd7897cf512', '1606770306391-7235245d4727']
+        };
 
         let coverUrl = 'https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d?auto=format&fit=crop&q=80'; // Working Fallback
 
         try {
             console.log('Selecting Unsplash photo for the blog...');
+            const category = generatedData.category?.toUpperCase() || 'CLINIC';
+            const pool = UNSPLASH_CATEGORIES[category] || UNSPLASH_CATEGORIES['CLINIC'];
 
             // Randomly pick a high-quality photo from our verified set
-            const randomId = UNSPLASH_IDS[Math.floor(Math.random() * UNSPLASH_IDS.length)];
+            const randomId = pool[Math.floor(Math.random() * pool.length)];
             const imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1200`;
 
             // 3. Upload to Supabase Storage to make it permanent
-            console.log(`Downloading Unsplash image: ${randomId}`);
+            console.log(`Downloading Unsplash image category ${category}: ${randomId}`);
             const imgFetch = await fetch(imageUrl);
 
             if (imgFetch.ok) {
