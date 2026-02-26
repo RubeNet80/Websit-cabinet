@@ -1,0 +1,29 @@
+{
+  "waitingList": [
+    {
+      "id": "1",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "phone": "06 00 00 00 01",
+      "motif": "Douleur lombaire",
+      "createdAt": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "firstName": "Marie",
+      "lastName": "Curie",
+      "phone": "06 00 00 00 02",
+      "motif": "Rééducation épaule",
+      "createdAt": "2026-02-21T11:00:00Z"
+    },
+    {
+      "id": "b93012b9-24df-4a5a-9ade-c2b8ecfbd586",
+      "firstName": "Test",
+      "lastName": "Verification",
+      "phone": "0000000000",
+      "motif": "Verification terminale",
+      "createdAt": "2026-02-21T21:29:05.437Z"
+    }
+  ],
+  "blog": []
+}

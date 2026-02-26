@@ -1,0 +1,8 @@
+node_modules
+.next
+.netlify
+out
+build
+*.log
+deno.lock
+netlify.toml
