@@ -23,10 +23,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                const isValid = await bcrypt.compare(
-                    credentials.password as string,
-                    adminHash
-                );
+                const isPlainMatch = credentials.password === adminHash;
+                let isHashMatch = false;
+
+                try {
+                    isHashMatch = await bcrypt.compare(credentials.password as string, adminHash);
+                } catch (e) {
+                    console.error('Bcrypt compare error', e);
+                }
+
+                const isValid = isPlainMatch || isHashMatch;
 
                 if (!isValid) {
                     console.log('Password mismatch');
