@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-// import OpenAI from 'openai'; // Removed in favor of Google AI
+import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -96,57 +96,59 @@ export async function POST(request: Request) {
             generatedData = JSON.parse(jsonMatch[0]);
         }
 
-        // 2. Unsplash "Smart Picker" Logic (Verified Physiotherapy Photos)
-        const UNSPLASH_CATEGORIES: Record<string, string[]> = {
-            'CLINIC': ['1597452485669-2c7bb5fef90d', '1581091226825-a6a2a5aee158', '1586773860418-d3196f0dd0c8', '1516549655169-df84a0774514'],
-            'MASSAGE': ['1571010263507-6c2e366fd2f5', '1519823551278-64ac92734fb1', '1544367567-0f2fcb009e0b'],
-            'EXERCISE': ['1505751172107-5730d10b434b', '1629909613654-28e377c37b09', '1571013144490-db29f4b1bc4d'],
-            'ANATOMY': ['1532938421977-0adea9b3d16b', '1631815589968-fdb09a223b1a', '1576091160550-217359f42f8c'],
-            'WELLNESS': ['1506126613408-eca67ad46800', '1552196564-9fd7897cf512', '1606770306391-7235245d4727']
-        };
-
-        let coverUrl = 'https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d?auto=format&fit=crop&q=80'; // Working Fallback
+        // 2. OpenAI DALL-E 3 Image Generation
+        let coverUrl = 'https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d?auto=format&fit=crop&q=80'; // Fallback
 
         try {
-            console.log('Selecting Unsplash photo for the blog...');
-            const category = generatedData.category?.toUpperCase() || 'CLINIC';
-            const pool = UNSPLASH_CATEGORIES[category] || UNSPLASH_CATEGORIES['CLINIC'];
+            console.log('Generating image with OpenAI DALL-E 3...');
+            const openaiKey = process.env.OPENAI_API_KEY;
 
-            // Randomly pick a high-quality photo from our verified set
-            const randomId = pool[Math.floor(Math.random() * pool.length)];
-            const imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1200`;
+            if (openaiKey) {
+                const openai = new OpenAI({ apiKey: openaiKey });
+                const imageResponse = await openai.images.generate({
+                    model: "dall-e-3",
+                    prompt: `A professional, realistic, and high-quality image for a physiotherapy clinic blog post about: ${topic}. The image should be welcoming, medical but warm, and highly relevant to the topic.`,
+                    n: 1,
+                    size: "1024x1024",
+                });
 
-            // 3. Upload to Supabase Storage to make it permanent
-            console.log(`Downloading Unsplash image category ${category}: ${randomId}`);
-            const imgFetch = await fetch(imageUrl);
+                const imageUrl = imageResponse.data?.[0]?.url;
 
-            if (imgFetch.ok) {
-                const arrayBuffer = await imgFetch.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const fileName = `blog/${uuidv4()}.png`;
+                if (imageUrl) {
+                    console.log(`Downloading generated image from OpenAI...`);
+                    const imgFetch = await fetch(imageUrl);
 
-                console.log(`Uploading Unsplash image to Storage: ${fileName} (${buffer.byteLength} bytes)`);
-                const { error: uploadError } = await supabaseAdmin
-                    .storage
-                    .from('blog-images')
-                    .upload(fileName, buffer, {
-                        contentType: 'image/png',
-                        upsert: true
-                    });
+                    if (imgFetch.ok) {
+                        const arrayBuffer = await imgFetch.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+                        const fileName = `blog/${uuidv4()}.png`;
 
-                if (!uploadError) {
-                    const { data } = supabaseAdmin
-                        .storage
-                        .from('blog-images')
-                        .getPublicUrl(fileName);
-                    coverUrl = data.publicUrl;
-                    console.log('Unsplash image hosted successfully in Supabase:', coverUrl);
-                } else {
-                    console.error('Supabase Storage upload error:', uploadError);
-                    coverUrl = imageUrl; // Fallback to direct Unsplash link
+                        console.log(`Uploading DALL-E image to Storage: ${fileName}`);
+                        const { error: uploadError } = await supabaseAdmin
+                            .storage
+                            .from('blog-images')
+                            .upload(fileName, buffer, {
+                                contentType: 'image/png',
+                                upsert: true
+                            });
+
+                        if (!uploadError) {
+                            const { data } = supabaseAdmin
+                                .storage
+                                .from('blog-images')
+                                .getPublicUrl(fileName);
+                            coverUrl = data.publicUrl;
+                            console.log('DALL-E image hosted successfully in Supabase:', coverUrl);
+                        } else {
+                            console.error('Supabase Storage upload error:', uploadError);
+                            coverUrl = imageUrl; // Fallback to direct DALL-E link
+                        }
+                    } else {
+                        console.warn('Failed to fetch image from OpenAI. Using fallback.');
+                    }
                 }
             } else {
-                console.warn('Failed to fetch image from Unsplash. Using fallback.');
+                console.warn('OPENAI_API_KEY missing, using fallback image.');
             }
         } catch (imageErr) {
             const error = imageErr as Error;
