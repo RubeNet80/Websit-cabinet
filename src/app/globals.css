@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #137fec;
-  --color-background-light: #f6f7f8;
-  --color-background-dark: #101922;
+  --color-primary: #0a66c2;
+  --color-primary-light: #eff6ff;
+  --color-background-light: #fbfbfc;
+  --color-background-dark: #0f172a;
   --font-family-display: 'Manrope', sans-serif;
 }
 
@@ -11,11 +12,18 @@ body {
   font-family: 'Manrope', sans-serif;
   -webkit-tap-highlight-color: transparent;
   min-height: max(884px, 100dvh);
+  background-color: var(--color-background-light);
+  color: #1e293b;
 }
 
 .ios-blur {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.premium-shadow {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -31,7 +39,7 @@ body {
   font-size: 24px;
 }
 
-@keyframes pulse {
+@keyframes pulse-soft {
 
   0%,
   100% {
@@ -39,10 +47,10 @@ body {
   }
 
   50% {
-    opacity: 0.4;
+    opacity: 0.6;
   }
 }
 
 .animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-soft 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

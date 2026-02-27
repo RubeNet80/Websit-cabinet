@@ -3,13 +3,16 @@ import Image from 'next/image';
 
 const Practitioners = () => {
     return (
-        <section className="px-4 mt-12" id="praticiens">
-            <div className="max-w-2xl mx-auto">
-                <h3 className="text-xl font-extrabold mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">groups</span>
-                    Nos Praticiens
-                </h3>
-                <div className="grid gap-4">
+        <section className="px-4 mt-20" id="praticiens">
+            <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-12">
+                    <span className="text-primary font-bold uppercase tracking-widest text-sm mb-2 block">L&apos;Équipe</span>
+                    <h3 className="text-3xl md:text-4xl font-extrabold text-slate-800">
+                        Vos praticiens certifiés
+                    </h3>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
                     {[
                         {
                             name: 'Leslie Forel', phone: '06 18 75 49 15', tel: '0618754915',
@@ -20,8 +23,8 @@ const Practitioners = () => {
                             img: '/images/ruben.jpg'
                         }
                     ].map((p, i) => (
-                        <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                            <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 shrink-0 relative" style={{ borderColor: 'rgba(19,127,236,0.2)' }}>
+                        <div key={i} className="bg-white p-6 rounded-[2rem] premium-shadow flex flex-row items-center gap-6 border border-slate-50 transition-transform hover:-translate-y-1 hover:shadow-2xl">
+                            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-slate-100 shrink-0 relative shadow-inner">
                                 <Image
                                     alt={p.name}
                                     src={p.img}
@@ -30,10 +33,10 @@ const Practitioners = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <h4 className="font-bold text-slate-900">{p.name}</h4>
-                                <p className="text-primary text-xs font-semibold uppercase mb-2">Masseur-Kinésithérapeute</p>
-                                <a className="inline-flex items-center gap-1 text-slate-600 text-sm" href={`tel:${p.tel}`}>
-                                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>call</span>
+                                <p className="text-[#0a66c2] text-xs font-bold uppercase tracking-wider mb-1">Masseur-Kinésithérapeute</p>
+                                <h4 className="text-xl font-extrabold text-slate-900 mb-2">{p.name}</h4>
+                                <a className="inline-flex items-center gap-2 text-slate-600 font-medium hover:text-primary transition-colors bg-slate-50 py-1.5 px-3 rounded-xl text-sm w-max" href={`tel:${p.tel}`}>
+                                    <span className="material-symbols-outlined text-[18px]">call</span>
                                     {p.phone}
                                 </a>
                             </div>
