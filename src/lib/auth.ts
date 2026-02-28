@@ -13,8 +13,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: 'Mot de passe', type: 'password' },
             },
             async authorize(credentials) {
-                const adminEmail = process.env.ADMIN_EMAIL;
-                const adminHash = process.env.ADMIN_PASSWORD_HASH;
+                const adminEmail = process.env.ADMIN_EMAIL?.trim();
+                const adminHash = process.env.ADMIN_PASSWORD_HASH?.trim();
 
                 if (!adminEmail || !adminHash) {
                     return null;
